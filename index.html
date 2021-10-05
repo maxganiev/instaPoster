@@ -381,7 +381,11 @@ const draw = ()=>{
 	//set canvas dims:
 	canvas.width = canvasDims.width;
 	canvas.height = canvasDims.height;
-	
+
+	//reset text pos:
+	hearderPosSwitcher.yAxis.setAttribute('max', canvas.height);
+	textPosSwitcher.yAxis.setAttribute('max', canvas.height);
+		
 	ctx.clearRect(0,0,canvas.width, canvas.height);
 
 	//set canvas color:
