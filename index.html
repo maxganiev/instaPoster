@@ -253,7 +253,7 @@ Array.from(logoSelector).forEach((logo, index)=> {
 Array.from(logoSelector).forEach((logo, index, arr)=> logo.onclick = ()=> {
 	logo.style.border = '2px blue dotted';
 	selectedLogo = images[index];
-	draw();
+	draw(mainTextPos.x, mainTextPos.y);
 	arr.forEach((l, i)=> index !== i ? l.style.border = '1px #000 solid' : '2px blue dotted')
 });
 
@@ -264,7 +264,7 @@ ctx = canvas.getContext('2d');
 
 let canvasColor = '#000';
 const colorSelector = document.querySelector('#colorSelector');
-colorSelector.oninput = ()=> {canvasColor = colorSelector.value; draw()}
+colorSelector.oninput = ()=> {canvasColor = colorSelector.value; draw(mainTextPos.x, mainTextPos.y)}
 
 const canvasDims = {
 	width: 420,
@@ -279,36 +279,36 @@ const postTypeSelector = document.querySelector('#postTypeSelector').onchange = 
 	switch(e.target.value){
 		case 'Пост':
 		canvasDims.height = 420;
-		draw()
+		draw(mainTextPos.x, mainTextPos.y)
 		break
 
 		case 'Сториз':
 		canvasDims.height = 700;
-		draw()
+		draw(mainTextPos.x, mainTextPos.y)
 		break
 
 	}
 };
 
 let fontSize = 'calc(1.3rem + 1vmin)';
-const fontSizeSelector = document.querySelector('#fontSizeSelector').onchange = (e)=> {fontSize = `calc(${e.target.value}rem + 1vmin)`; draw()};
+const fontSizeSelector = document.querySelector('#fontSizeSelector').onchange = (e)=> {fontSize = `calc(${e.target.value}rem + 1vmin)`; draw(mainTextPos.x, mainTextPos.y)};
 
 let fontFormat = 'normal';
 const fontFormatSelector = document.querySelector('#fontFormatSelector').onchange = (e)=>{
 	switch(e.target.value){
 		case 'Обычный':
 		fontFormat = 'normal';
-		draw();
+		draw(mainTextPos.x, mainTextPos.y);
 		break
 
 		case 'С наклоном':
 		fontFormat = 'Italic';
-		draw();
+		draw(mainTextPos.x, mainTextPos.y);
 		break
 
 		case 'Жирный':
 		fontFormat = 'bold';
-		draw();
+		draw(mainTextPos.x, mainTextPos.y);
 		break
 	}
 };
@@ -328,13 +328,13 @@ hearderPosSwitcher.xAxis.setAttribute('max', canvas.width);
 hearderPosSwitcher.yAxis.setAttribute('max', canvas.height);
 
 
-hearderPosSwitcher.xAxis.onchange = (e)=> {headerPos.x = Number(e.target.value); draw()};
-hearderPosSwitcher.yAxis.onchange = (e)=> {headerPos.y = Number(e.target.value); draw()};
+hearderPosSwitcher.xAxis.onchange = (e)=> {headerPos.x = Number(e.target.value); draw(mainTextPos.x, mainTextPos.y)};
+hearderPosSwitcher.yAxis.onchange = (e)=> {headerPos.y = Number(e.target.value); draw(mainTextPos.x, mainTextPos.y)};
 
 
 let mainTextPos = {
-	x: canvas.width/2,
-	y: canvas.height/1.8
+	x: 10,
+	y: 30
 };
 
 
@@ -346,8 +346,8 @@ const textPosSwitcher = {
 textPosSwitcher.xAxis.setAttribute('max', canvas.width);
 textPosSwitcher.yAxis.setAttribute('max', canvas.height);
 
-textPosSwitcher.xAxis.onchange = (e)=> {mainTextPos.x = Number(e.target.value); draw()};
-textPosSwitcher.yAxis.onchange = (e)=> {mainTextPos.y = Number(e.target.value); draw()};
+textPosSwitcher.xAxis.onchange = (e)=> {mainTextPos.x = Number(e.target.value); draw(mainTextPos.x, mainTextPos.y)};
+textPosSwitcher.yAxis.onchange = (e)=> {mainTextPos.y = Number(e.target.value); draw(mainTextPos.x, mainTextPos.y)};
 
 
 
@@ -355,28 +355,42 @@ let headerFontColor = '#000';
 const headerTextColor = document.querySelector('#headerTextColor');
 headerTextColor.oninput = ()=> {
 	headerFontColor = headerTextColor.value;
-	draw();
+	draw(mainTextPos.x, mainTextPos.y);
 }
 
 
-let mainFontColor = '#000';
+let mainFontColor = '#fff';
 const mainTextColor = document.querySelector('#mainTextColor');
 mainTextColor.oninput = ()=> {
 	mainFontColor = mainTextColor.value;
-	draw();
+	draw(mainTextPos.x, mainTextPos.y);
 };
 
 
 let headerContent = '';
-const hearderText = document.querySelector('#hearderText').onkeyup = (e)=> {headerContent = e.target.value; draw()}
+const hearderText = document.querySelector('#hearderText').onkeyup = (e)=> {headerContent = e.target.value; draw(mainTextPos.x, mainTextPos.y)}
 
 
 let textContent = '';
-const mainText = document.querySelector('#mainText').onkeyup = (e)=> {textContent = e.target.value; draw()};
+const mainText = document.querySelector('#mainText');
+
+mainText.onkeyup = (e)=> {
+
+textContent = e.target.value; 
+draw(mainTextPos.x, mainTextPos.y)
+};
+
+let selected = '';
+mainText.onselect = (e)=>{
+	selected = e.target.value.substring(e.target.selectionStart, e.target.selectionEnd);
+	console.log(selected)
+	draw(mainTextPos.x, mainTextPos.y)
+}
 
 
 
-const draw = ()=>{
+
+const draw = (mainTextPosX, mainTextPosY)=>{
 	
 	//set canvas dims:
 	canvas.width = canvasDims.width;
@@ -385,6 +399,12 @@ const draw = ()=>{
 	//reset text pos:
 	hearderPosSwitcher.yAxis.setAttribute('max', canvas.height);
 	textPosSwitcher.yAxis.setAttribute('max', canvas.height);
+
+	//reset text pos:
+	mainTextPos.x = mainTextPosX;
+	mainTextPos.y = mainTextPosY;
+
+	
 		
 	ctx.clearRect(0,0,canvas.width, canvas.height);
 
@@ -400,37 +420,27 @@ const draw = ()=>{
 	
 	
 	ctx.font = 'bold calc(2.2rem + 1vmin) Montserrat';
-	ctx.lineWidth = 1.4;
+	ctx.lineWidth = 1.8;
 	ctx.fillText(headerContent, headerPos.x, headerPos.y);
 	ctx.closePath();
 
 	//add main text content
 	ctx.beginPath();
 	ctx.fillStyle = mainFontColor;
-	const words = textContent.split(' ');
-	const lineHeight = 25;
-	let line = '';
-
-
-	words.forEach(word => {
-		let testLine = line + word + " "; 
-
-		const lineWidth = ctx.measureText(testLine).width;
-
-		
-		if(lineWidth > canvas.width - 50 ){
-			ctx.font = `${fontFormat} ${fontSize} Montserrat`;
-			ctx.fillText(line, mainTextPos.x, mainTextPos.y);
-			line = word + ' ';
-			 mainTextPos.y += lineHeight;
-			
-		} else {
-			line = testLine;
-		}
-	})
-	ctx.font = `${fontFormat} ${fontSize} Montserrat`;
-	ctx.fillText(line, mainTextPos.x, mainTextPos.y);
 	ctx.closePath();
+
+	const lineHeight = 30;
+
+
+	//split text into words by line breaks if any:
+	const words = textContent.split('\n'); 
+		words.forEach((word, index) => {
+			ctx.font = `${fontFormat} ${fontSize} Montserrat`;
+			ctx.fillText(word, mainTextPos.x, mainTextPos.y + (index * lineHeight));
+			ctx.closePath();
+		});
+
+	
 
 	//draw logo
 	if(selectedLogo !== null){
@@ -440,9 +450,14 @@ const draw = ()=>{
 	}
 
 
-
-	mainTextPos.y = canvas.height/1.8;
+	//preventing text sliding beyound the box
+	 mainTextPos.y =  mainTextPos.y > canvas.height ? 30 : mainTextPos.y;
 }
+
+
+
+
+
 
 
 
